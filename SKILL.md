@@ -17,7 +17,7 @@ When an LLM blasts out a solution, it optimizes for the next token, not the next
 
 4. **Be pragmatic, not dogmatic.** This skill recommends Pydantic, Zod, Ruff, Repository pattern, etc. because they fit common stacks. But if the codebase already uses Joi, attrs, Drizzle, or some other equivalent — extend what's there. The goal is *consistent boundaries*, not specific libraries.
 
-5. **One pass at a time.** Don't try to fix all 13 anti-patterns simultaneously. Pick the highest-leverage one for the user's current pain, fix it across the codebase, then move to the next.
+5. **One pass at a time.** Don't try to fix every anti-pattern simultaneously. Pick the highest-leverage one for the user's current pain, fix it across the codebase, then move to the next.
 
 ## Workflow
 
@@ -27,7 +27,7 @@ Map the blast radius before touching anything. Produce a written audit, share it
 
 **Use the codebase graph tools** (`mcp__codebase-memory-mcp__*`) as the primary discovery mechanism — they surface call chains, fan-out, and cross-service edges that text search cannot. If the repo is not indexed, run `index_repository` first. Fall back to `Grep`/`Read` only for configs and non-code files.
 
-Walk the [13 anti-pattern checklist](#the-13-anti-patterns-detection-signals) below. For each, record:
+Walk the [anti-pattern checklist](#anti-patterns-detection-signals) below. For each, record:
 
 - **Present?** (yes / no / partial)
 - **Severity** (blocker / high / medium / low) — based on user-facing impact, not aesthetic
@@ -79,7 +79,7 @@ Now the safer changes become possible:
 - **Run aggressive linters in strict mode.** Ruff for Python; ESLint + TypeScript strict for JS/TS. Fix the autofixable warnings; create issues for the rest rather than disabling rules.
 - **Add intent documentation.** Not "what" comments — *why* comments at non-obvious decisions. Architecture decision records (ADRs) for cross-cutting choices.
 
-## The 13 Anti-Patterns: Detection signals
+## Anti-patterns: detection signals
 
 When triaging, look for these patterns. The "signal" column tells you what to grep / query / inspect.
 
@@ -91,13 +91,15 @@ When triaging, look for these patterns. The "signal" column tells you what to gr
 | 4 | **Happy-path obsession** | Look for missing `try`/`except` around I/O, no timeouts on outbound HTTP, no validation of optional fields, no handling of empty lists/None. |
 | 5 | **Database query chaos** | Look for ORM calls inside loops, missing `.select_related` / `JOIN`s, missing indexes on filter columns, raw `SELECT *`. |
 | 6 | **Hallucinated/bloated deps** | Audit `package.json` / `pyproject.toml`. Cross-reference each dep against npm/PyPI. Look for deprecated, archived, or single-use deps that wrap stdlib. |
-| 7 | **Silent catch-alls** | `except Exception:`, `except:`, `catch (e) {}`, `.catch(() => {})`. |
+| 7 | **Silent failures end-to-end** | Three places to check: code (`except Exception:`, `catch (e) {}`, `.catch(() => {})`); UX (what does the user see when an external API times out — blank screen? infinite spinner? frozen form?); observability (is there *any* error tracking — Sentry, Datadog, structured logs?). All three layers usually fail together. |
 | 8 | **State mutation spaghetti** | Look for globally mutable stores, prop drilling >3 levels, `useEffect` chains, implicit subscriptions. |
-| 9 | **Context window amnesia** (contradictory business rules) | Compare similar functions in different modules — do they enforce different constraints? Look for duplicated logic that has subtly diverged. |
+| 9 | **Context window amnesia** (contradictory rules *and* duplicate registrations) | Two sub-failures: (a) similar functions in different modules enforce different constraints (drift); (b) the *same* trigger fires *two* near-identical workflows because the AI generated the feature twice under slightly different names (`sendWelcomeEmail` vs `notifyNewUser`, two `POST /signup` side-effects, two Stripe customer creations). Sort handlers/routes/cron entries alphabetically and scan for semantic near-duplicates. |
 | 10 | **Sync blocking in async** | `requests.get`, sync DB drivers, `time.sleep`, blocking file I/O inside `async def`. In Node: long sync loops in handlers. |
 | 11 | **Missing test harness** | Check for `tests/` or `__tests__/` directories. Run `pytest --collect-only` / `vitest --run --reporter=verbose`. |
-| 12 | **Security blindspots** | Look for unsanitized user input in queries (string interpolation in SQL), missing auth on endpoints, missing CSRF tokens, `dangerouslySetInnerHTML`, eval, missing rate limits. |
+| 12 | **Security blindspots** (incl. broken object-level authorization) | The big one in multi-tenant apps: **authentication ≠ authorization**. The AI builds login, then routes filter only by "is logged in," not by "owns this row." Test by logging in as user A, hitting an endpoint with user B's resource ID, and seeing if it returns. Also: unsanitized SQL string interpolation, missing CSRF tokens, `dangerouslySetInnerHTML`, `eval`, missing rate limits, no per-user resource scoping in queries. |
 | 13 | **Intent-free documentation** | Scan comments — are they "what" (`# loop through users`) or "why" (`# users sorted by signup_date to preserve onboarding cohort`)? Check for an ADR / decision log. |
+| 14 | **Webhook / event-handler state-machine gaps** | The AI implements the success event and stops. For Stripe: `checkout.session.completed` exists, but `customer.subscription.deleted`, `invoice.payment_failed`, `charge.refunded`, `customer.subscription.updated` are missing — so cancelled users keep accessing paid features, failed payments aren't surfaced. Same shape for any webhook source (PayPal, GitHub, Shopify, Twilio): list every event the upstream emits, then check coverage. |
+| 15 | **Secrets pasted into AI chat history** | Vibe-coding-specific. Any secret pasted into an LLM chat (Stripe keys, DB passwords, API tokens, service role keys) now lives in a transcript on a platform whose security posture you don't control. Even if the chat is "private," it has likely been logged, used for fine-tuning consent, or leaked in a vendor breach. Check: has the user ever pasted a real key while debugging? If yes, rotate every secret that was ever pasted, and switch to placeholder-based debugging (`STRIPE_SECRET_KEY` as a variable name only). |
 
 ## Language-specific deep dives
 

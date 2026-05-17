@@ -10,7 +10,7 @@ Triggers whenever you describe a codebase as "vibe coded", "AI slop", "a mess", 
 
 Claude will then:
 
-1. **Triage** — walk a checklist of 13 anti-patterns common in LLM-generated codebases (God components, type illusion, N+1 queries, silent catch-alls, async/sync hazards, prompt drift, etc.) and produce a prioritized audit with concrete file paths.
+1. **Triage** — walk a checklist of anti-patterns common in LLM-generated codebases (God components, type illusion, N+1 queries, silent failures, async/sync hazards, prompt drift, broken row-level authorization, webhook gaps, secrets in chat history, etc.) and produce a prioritized audit with concrete file paths.
 2. **Plan** — group findings into phases (boundaries → safety net → structural → polish) and pause for your approval before changing code.
 3. **Fix incrementally** — apply the Strangler Fig pattern: lock down edges with strict parsing, write black-box integration tests as a safety net, then refactor structure.
 
@@ -58,7 +58,7 @@ This isn't a linter. It doesn't try to autofix everything. The remediation workf
 2. **Lock down the edges first.** Parse, don't validate. Strict schemas at every system boundary create a trust region the interior can refactor safely.
 3. **Tests are the safety net, not the goal.** Write high-level black-box integration tests against current behavior — then refactor.
 4. **Be pragmatic, not dogmatic.** Adapt to existing tooling. Consistency at boundaries matters more than which library.
-5. **One pass at a time.** Don't try to fix all 13 anti-patterns simultaneously. Highest-leverage first.
+5. **One pass at a time.** Don't try to fix every anti-pattern simultaneously. Highest-leverage first.
 
 ## Contributing
 
