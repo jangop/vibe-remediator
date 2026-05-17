@@ -1,0 +1,9 @@
+# macOS / editor cruft
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Skill packaging artifacts
+*.skill
