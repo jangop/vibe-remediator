@@ -120,3 +120,68 @@ Read these on demand — only load the playbook for the stack the codebase actua
 If the user asks for a ground-up rewrite, push back — explain the Strangler Fig pattern and the costs of rewriting (lost encoded behavior, no incremental value, regressions). Only proceed with a rewrite if they confirm with full understanding of the tradeoffs.
 
 If the user wants to fix everything in one session, propose a phased plan instead and ask them to pick the most painful phase.
+
+---
+
+## Self-improvement: report findings upstream
+
+This skill is open source. You — the agent running it on a user's codebase — are *not* its maintainer. Don't edit `SKILL.md` or `references/*` in place; the user running you didn't sign up to ship skill upgrades. Instead, when you notice a way this skill could be sharper, file an issue against the upstream repo.
+
+Upstream: `https://github.com/jangop/vibrator` — use `gh issue create --repo jangop/vibrator` if `gh` is available, otherwise show the user a pre-filled issue body they can paste into the browser.
+
+### When to reflect
+
+- **Session wrap-up** — the user signals they're done, or engagement falls off.
+- **End of a remediation phase** — boundaries locked across the codebase, integration tests green, a God file fully decomposed.
+- **Surprise moments** — a detection signal misfired, a remediation backfired, a step that's always skipped turned out to be load-bearing somewhere.
+
+You don't need permission to *think* about improvements. Ask the user before *filing* anything — the issue will be public and attributed to their GitHub account.
+
+### What's worth reporting
+
+- **Detection signals that generalized.** A grep, query, or graph traversal that found the same anti-pattern in multiple unrelated modules — not just one suspicious line.
+- **Heuristics that made decisions easier.** Rules of thumb that resolved many similar small decisions without thinking ("don't extract a component until it's used twice or exceeds ~50 lines of JSX").
+- **Playbook steps that never paid off.** If a recommended action has been prescribed across several sessions and never proved useful, that's worth surfacing.
+- **Repeated micro-tasks.** If the agent ends up doing the same little dance over and over across different sessions (rewriting `dict[str, Any]`, swapping `requests` for `httpx`, the same Zod-around-`fetch` wrap), that's a candidate for a bundled script or a tighter playbook example.
+
+### What's *not* worth reporting (anti-overfitting guardrails)
+
+- **Codebase-specific names.** No file paths, function names, package versions, or framework quirks from this one session. Strip them out before generalizing — if you can't strip them out, the lesson isn't general enough to file.
+- **One-shot decisions.** Choices driven by a single user's preference or a single codebase's history don't belong in the skill. The next user's situation is different.
+- **War stories.** Don't propose adding long worked examples from this session. The skill is a guide, not a portfolio.
+- **Hedging caveats.** Don't propose "but sometimes you should do the opposite" unless the opposite case is genuinely common. Caveats erode every rule they attach to.
+
+### Three tests before filing
+
+1. **Does it apply across at least three plausibly different codebases?** If you can only picture this one, it's overfitting.
+2. **Does it survive a name swap?** Mentally replace FastAPI with Flask, Pydantic with attrs, Next.js with Remix. Does the principle still hold? If not, the advice is mechanism-specific — it belongs in the relevant `references/*-playbook.md`, not the main SKILL.md.
+3. **Are you proposing it because it's *valuable*, or because it's *fresh in memory*?** Recency bias drives skill bloat. If you couldn't recall this example a week from now, neither could a future user.
+
+### Issue format
+
+Surface the proposal to the user first, in plain language: "Here's what I noticed during this session that might generalize: [...]". If they agree it's worth filing, open an issue with this structure:
+
+```
+Title: [observation] suggests [change]
+
+## What I noticed
+A short, codebase-neutral description of the pattern or gap.
+
+## Why it might generalize
+Why this isn't a one-codebase quirk. Reference the three tests if useful.
+
+## Proposed change
+- Section of SKILL.md or references/*-playbook.md affected
+- Concrete suggested edit (sketch, not final wording)
+- What it would replace or remove, if anything (favor replacement over appending)
+
+## Counter-considerations
+- When this advice would be wrong
+- Whether it competes with anything already in the skill
+```
+
+Encourage the user to add their own framing before submitting — they have context the agent doesn't.
+
+### Replace and remove, don't just append
+
+Whatever change you propose, favor *sharpening* over *adding*. The skill stays useful by getting smaller and clearer over time, not by growing. If a proposed addition doesn't subsume or replace existing text, ask yourself whether the existing text is still pulling its weight.
