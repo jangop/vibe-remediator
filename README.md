@@ -1,8 +1,10 @@
-# vibrator
+# vibe-remediator
 
-> **VIB**e-**R**emedi-**ATOR** — a Claude Code skill for taming AI-generated codebases.
+> A Claude Code skill for taming AI-generated codebases.
+>
+> <sub>(Yes, **VIB**e-**R**emedi-**ATOR**. The acronym is intentional. It's the only joke in the repo.)</sub>
 
-When an LLM blasts out a solution, it optimizes for the next token, not the next year of maintenance. `vibrator` is a [Claude](https://www.anthropic.com/claude-code) [skill](https://docs.claude.com/en/docs/claude-code/skills) that gives Claude a structured workflow for auditing and incrementally remediating the systemic flaws that result — without falling into the "ground-up rewrite" trap.
+When an LLM blasts out a solution, it optimizes for the next token, not the next year of maintenance. `vibe-remediator` is a [Claude](https://www.anthropic.com/claude-code) [skill](https://docs.claude.com/en/docs/claude-code/skills) that gives Claude a structured workflow for auditing and incrementally remediating the systemic flaws that result — without falling into the "ground-up rewrite" trap.
 
 ## What it does
 
@@ -26,14 +28,14 @@ Language-specific deep dives live in `references/` and are loaded on demand base
 ### Option 1 — clone into your global skills directory
 
 ```bash
-git clone https://github.com/<your-username>/vibrator.git ~/.claude/skills/vibe-remediator
+git clone https://github.com/jangop/vibe-remediator.git ~/.claude/skills/vibe-remediator
 ```
 
 ### Option 2 — clone anywhere and symlink
 
 ```bash
-git clone https://github.com/<your-username>/vibrator.git
-ln -s "$(pwd)/vibrator" ~/.claude/skills/vibe-remediator
+git clone https://github.com/jangop/vibe-remediator.git
+ln -s "$(pwd)/vibe-remediator" ~/.claude/skills/vibe-remediator
 ```
 
 Then in Claude Code, run `/reload-plugins` (or restart the session). The skill should appear in your available skills list as `vibe-remediator`.

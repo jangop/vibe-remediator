@@ -129,7 +129,7 @@ If the user wants to fix everything in one session, propose a phased plan instea
 
 This skill is open source. You — the agent running it on a user's codebase — are *not* its maintainer. Don't edit `SKILL.md` or `references/*` in place; the user running you didn't sign up to ship skill upgrades. Instead, when you notice a way this skill could be sharper, file an issue against the upstream repo.
 
-Upstream: `https://github.com/jangop/vibrator` — use `gh issue create --repo jangop/vibrator` if `gh` is available, otherwise show the user a pre-filled issue body they can paste into the browser.
+Upstream: `https://github.com/jangop/vibe-remediator` — use `gh issue create --repo jangop/vibe-remediator` if `gh` is available, otherwise show the user a pre-filled issue body they can paste into the browser.
 
 ### When to reflect
 
