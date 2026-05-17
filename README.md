@@ -16,7 +16,7 @@ Claude will then:
 2. **Plan** — group findings into phases (boundaries → safety net → structural → polish) and pause for your approval before changing code.
 3. **Fix incrementally** — apply the Strangler Fig pattern: lock down edges with strict parsing, write black-box integration tests as a safety net, then refactor structure.
 
-The skill is **guide-informed, pragmatic**: if the codebase already uses Joi instead of Zod, attrs instead of Pydantic, or Drizzle instead of SQLAlchemy, it adapts to what's there rather than dogmatically prescribing one stack.
+The skill is **pragmatic, not dogmatic**: if the codebase already uses Joi instead of Zod, attrs instead of Pydantic, or Drizzle instead of SQLAlchemy, it adapts to what's there rather than prescribing one stack.
 
 Language-specific deep dives live in `references/` and are loaded on demand based on the stack at hand:
 
@@ -42,15 +42,13 @@ Then in Claude Code, run `/reload-plugins` (or restart the session). The skill s
 
 ## Usage
 
-Just talk to Claude normally. Trigger phrases like:
+Just talk to Claude normally — you don't need to invoke the skill explicitly. Any of these will activate it:
 
 - "This codebase was vibe coded — can you clean it up?"
 - "Audit my FastAPI service for anti-patterns."
 - "I inherited this Next.js app and it's a mess. Where do I start?"
 - "Make this prototype production-ready."
 - "There are N+1 queries somewhere in here, find them."
-
-…should all activate the skill. You don't need to invoke it explicitly.
 
 ## Philosophy
 
